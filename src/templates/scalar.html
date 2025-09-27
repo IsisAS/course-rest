@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Course API Documentation - Scalar</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Modern API documentation for Course Management System" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .scalar-app {
+            --scalar-color-1: #1a1a1a;
+            --scalar-color-2: #2a2a2a;
+            --scalar-color-3: #8b5cf6;
+            --scalar-color-accent: #8b5cf6;
+            --scalar-background-1: #ffffff;
+            --scalar-background-2: #f8fafc;
+            --scalar-background-3: #f1f5f9;
+            --scalar-border-color: #e2e8f0;
+            --scalar-sidebar-background-1: #1e293b;
+            --scalar-sidebar-item-hover-color: #334155;
+            --scalar-sidebar-item-active-background: #8b5cf6;
+            --scalar-button-1: #8b5cf6;
+            --scalar-button-1-color: #ffffff;
+            --scalar-button-1-hover: #7c3aed;
+        }
+    </style>
+</head>
+<body>
+    <script
+        id="api-reference"
+        data-url="{{SPEC_URL}}"
+        data-configuration='{
+            "theme": "purple",
+            "layout": "modern",
+            "showSidebar": true,
+            "hideDownloadButton": false,
+            "searchHotKey": "k",
+            "darkMode": false,
+            "hideModels": false,
+            "hideAuthentication": false,
+            "isEditable": false,
+            "spec": {
+                "url": "{{SPEC_URL}}"
+            },
+            "customCss": ".scalar-app { --scalar-font: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif; } .scalar-card { border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); } .scalar-sidebar { background: linear-gradient(180deg, #1e293b 0%, #334155 100%); }",
+            "metaData": {
+                "title": "Course API Documentation",
+                "description": "Complete API documentation for the Course Management System built with Express.js and MongoDB",
+                "ogDescription": "Modern, interactive API documentation powered by Scalar",
+                "ogImage": "https://scalar.com/og-image.png"
+            },
+            "authentication": {
+                "preferredSecurityScheme": "bearerAuth",
+                "apiKey": {
+                    "token": ""
+                }
+            },
+            "defaultHttpClient": {
+                "targetKey": "javascript",
+                "clientKey": "fetch"
+            },
+            "servers": [
+                {
+                    "url": "http://localhost:3001/api",
+                    "description": "Development server"
+                }
+            ]
+        }'></script>
+    <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference@latest"></script>
+</body>
+</html>

@@ -64,7 +64,6 @@ class UserModel extends BaseModel_1.BaseModel {
                 required: true
             }
         });
-        // Middleware para hash da senha antes de salvar
         userSchema.pre('save', async function (next) {
             if (!this.isModified('password'))
                 return next();
@@ -79,7 +78,6 @@ class UserModel extends BaseModel_1.BaseModel {
         });
         super('User', userSchema);
     }
-    // Método específico para validar senha
     async validatePassword(email, password) {
         const user = await this.model.findOne({ email }).lean();
         if (!user)
@@ -87,13 +85,10 @@ class UserModel extends BaseModel_1.BaseModel {
         const isValid = await bcrypt.compare(password, user.password);
         return isValid ? user : null;
     }
-    // Método para buscar usuário por email
     async findByEmail(email) {
         return await this.model.findOne({ email }).lean();
     }
-    // Método para criar usuário (sobrescreve o método base para validações específicas)
     async create(userData) {
-        // Validação de email único
         if (userData.email) {
             const existingUser = await this.findByEmail(userData.email);
             if (existingUser) {
@@ -102,17 +97,14 @@ class UserModel extends BaseModel_1.BaseModel {
         }
         return await super.create(userData);
     }
-    // Método para atualizar usuário sem alterar a senha diretamente
     async updateProfile(id, userData) {
         return await this.updateById(id, userData);
     }
-    // Método para alterar senha
     async changePassword(id, newPassword) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(newPassword, salt);
         return await this.updateById(id, { password: hashedPassword });
     }
-    // Método para buscar usuários com suas inscrições
     async findWithEnrollments(id) {
         return await this.model.findById(id)
             .populate({
@@ -126,6 +118,5 @@ class UserModel extends BaseModel_1.BaseModel {
     }
 }
 exports.UserModel = UserModel;
-// Singleton instance
 exports.userModel = new UserModel();
 //# sourceMappingURL=user.model.js.map

@@ -9,6 +9,7 @@ const login = async (req, res) => {
     try {
         const authService = new auth_service_1.default();
         const { email, password } = req.body;
+        console.log("ENTROU AQUI", password);
         if (!email || !password) {
             res.status(400).json({
                 error: "Email e senha são obrigatórios"

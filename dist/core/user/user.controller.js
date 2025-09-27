@@ -6,7 +6,6 @@ const create = async (req, res) => {
     try {
         const userService = new user_service_1.UserService();
         const props = req.body;
-        // Validação básica
         if (!props.email || !props.password || !props.name || !props.birthDate) {
             res.status(400).json({
                 error: "Campos obrigatórios: email, password, name, birthDate"

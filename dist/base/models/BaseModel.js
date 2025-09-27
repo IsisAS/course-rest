@@ -8,14 +8,12 @@ const mongoose_1 = __importDefault(require("mongoose"));
 class BaseModel {
     constructor(modelName, schema) {
         this.schema = schema;
-        // Adiciona timestamps automáticos se não existirem
         if (!schema.paths.createdAt) {
             schema.add({ createdAt: { type: Date, default: Date.now } });
         }
         if (!schema.paths.updatedAt) {
             schema.add({ updatedAt: { type: Date, default: Date.now } });
         }
-        // Middleware para atualizar updatedAt
         schema.pre('save', function (next) {
             if (this.isModified() && !this.isNew) {
                 this.updatedAt = new Date();
@@ -28,7 +26,6 @@ class BaseModel {
         });
         this.model = mongoose_1.default.model(modelName, schema);
     }
-    // Métodos CRUD básicos
     async create(data) {
         const result = await this.model.create(data);
         return result;
@@ -71,7 +68,6 @@ class BaseModel {
         const result = await this.model.exists(filter);
         return result !== null;
     }
-    // Método para paginação
     async paginate(filter = {}, page = 1, limit = 10, sort = { createdAt: -1 }) {
         const skip = (page - 1) * limit;
         const [data, total] = await Promise.all([
@@ -86,7 +82,6 @@ class BaseModel {
             totalPages: Math.ceil(total / limit)
         };
     }
-    // Getter para acessar o modelo Mongoose diretamente quando necessário
     getModel() {
         return this.model;
     }
