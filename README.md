@@ -24,6 +24,8 @@ O projeto segue uma arquitetura em camadas baseada em princípios OOP:
 - **JWT** - Autenticação baseada em tokens
 - **bcryptjs** - Hash de senhas
 - **CORS** - Controle de acesso entre origens
+- **Scalar** - Documentação moderna de API
+- **Swagger/OpenAPI** - Especificação de API
 
 ## ⚙️ Instalação e Configuração
 
@@ -77,6 +79,41 @@ O projeto segue uma arquitetura em camadas baseada em princípios OOP:
 - `npm run dev` – Inicia em modo desenvolvimento com hot reload
 - `npm run build` – Compila os arquivos TypeScript
 - `npm run init` – Popula o banco com dados iniciais de cursos
+
+## 📖 Documentação da API
+
+A API possui documentação interativa completa disponível através de duas interfaces modernas:
+
+### 🎨 Scalar (Interface Principal)
+- **URL**: `http://localhost:3001/api/scalar`
+- **Características**:
+  - Interface moderna com tema roxo elegante
+  - Layout responsivo e intuitivo
+  - Sidebar escura para navegação
+  - Tipografia moderna e cards estilizados
+  - Suporte completo à autenticação Bearer Token
+  - Documentação completa de todos os endpoints
+  - Exemplos de requisições e respostas
+  - Esquemas de dados detalhados
+
+### 📋 Swagger UI (Interface Alternativa)
+- **URL**: `http://localhost:3001/api/docs`
+- **Características**:
+  - Interface clássica do Swagger
+  - Funcionalidade completa de teste de API
+  - Documentação OpenAPI padrão
+
+### 📄 Especificação OpenAPI
+- **URL**: `http://localhost:3001/api/docs.json`
+- **Formato**: JSON OpenAPI 3.0
+- **Uso**: Para integração com outras ferramentas de documentação
+
+### 🔑 Autenticação na Documentação
+Para testar endpoints protegidos na documentação:
+1. Faça login através do endpoint `/api/auth/login`
+2. Copie o token JWT retornado
+3. Na interface Scalar ou Swagger, clique em "Authorize"
+4. Insira o token no formato: `Bearer seu_token_aqui`
 
 ## 🔗 Endpoints da API
 
