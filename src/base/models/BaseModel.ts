@@ -13,7 +13,6 @@ export abstract class BaseModel<T extends IBaseModel> {
     constructor(modelName: string, schema: Schema) {
         this.schema = schema;
         
-        // Adiciona timestamps automáticos se não existirem
         if (!schema.paths.createdAt) {
             schema.add({ createdAt: { type: Date, default: Date.now } });
         }
@@ -21,7 +20,6 @@ export abstract class BaseModel<T extends IBaseModel> {
             schema.add({ updatedAt: { type: Date, default: Date.now } });
         }
 
-        // Middleware para atualizar updatedAt
         schema.pre('save', function(next) {
             if (this.isModified() && !this.isNew) {
                 this.updatedAt = new Date();
@@ -36,8 +34,6 @@ export abstract class BaseModel<T extends IBaseModel> {
 
         this.model = mongoose.model<T & Document>(modelName, schema);
     }
-
-    // Métodos CRUD básicos
     public async create(data: Partial<T>): Promise<T> {
         const result = await this.model.create(data);
         return result as T;
@@ -90,8 +86,6 @@ export abstract class BaseModel<T extends IBaseModel> {
         const result = await this.model.exists(filter);
         return result !== null;
     }
-
-    // Método para paginação
     public async paginate(
         filter: any = {},
         page: number = 1,
@@ -118,8 +112,6 @@ export abstract class BaseModel<T extends IBaseModel> {
             totalPages: Math.ceil(total / limit)
         };
     }
-
-    // Getter para acessar o modelo Mongoose diretamente quando necessário
     public getModel(): Model<T & Document> {
         return this.model;
     }
