@@ -1,7 +1,10 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const client_1 = require("@prisma/client");
-const prisma = new client_1.PrismaClient();
+const database_1 = __importDefault(require("../base/config/database"));
+const course_model_1 = require("../core/course/course.model");
 const CursosMockup = [
     {
         name: "Desenvolvimento Web com React e Next.js",
@@ -61,18 +64,31 @@ const CursosMockup = [
     },
 ];
 async function init() {
-    await prisma.course.createMany({
-        data: CursosMockup,
-        skipDuplicates: true,
-    });
-    console.log("✅ Cursos populados com sucesso!");
+    try {
+        await database_1.default.connect();
+        console.log('✅ Database connected successfully');
+        // Adicionar campos obrigatórios que não estão no mockup
+        const coursesWithDefaults = CursosMockup.map(course => ({
+            ...course,
+            isEnrolled: false,
+            enrollmentCancelled: false
+        }));
+        // Inserir cursos, ignorando duplicatas
+        for (const courseData of coursesWithDefaults) {
+            const existingCourses = await course_model_1.courseModel.searchByName(courseData.name);
+            if (existingCourses.length === 0) {
+                await course_model_1.courseModel.create(courseData);
+            }
+        }
+        console.log("✅ Cursos populados com sucesso!");
+    }
+    catch (error) {
+        console.error("❌ Erro ao popular cursos:", error);
+        process.exit(1);
+    }
+    finally {
+        await database_1.default.disconnect();
+    }
 }
-init()
-    .catch((e) => {
-    console.error("❌ Erro ao popular cursos:", e);
-    process.exit(1);
-})
-    .finally(async () => {
-    await prisma.$disconnect();
-});
+init();
 //# sourceMappingURL=curso.populate.js.map

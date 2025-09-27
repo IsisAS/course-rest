@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import DatabaseConnection from '../base/config/database';
+import { courseModel } from '../core/course/course.model';
 
 const CursosMockup = [
   {
@@ -61,19 +61,32 @@ const CursosMockup = [
 ];
 
 async function init() {
-  await prisma.course.createMany({
-    data: CursosMockup,
-    skipDuplicates: true,
-  });
+  try {
+    await DatabaseConnection.connect();
+    console.log('✅ Database connected successfully');
 
-  console.log("✅ Cursos populados com sucesso!");
+    // Adicionar campos obrigatórios que não estão no mockup
+    const coursesWithDefaults = CursosMockup.map(course => ({
+      ...course,
+      isEnrolled: false,
+      enrollmentCancelled: false
+    }));
+
+    // Inserir cursos, ignorando duplicatas
+    for (const courseData of coursesWithDefaults) {
+      const existingCourses = await courseModel.searchByName(courseData.name);
+      if (existingCourses.length === 0) {
+        await courseModel.create(courseData);
+      }
+    }
+
+    console.log("✅ Cursos populados com sucesso!");
+  } catch (error) {
+    console.error("❌ Erro ao popular cursos:", error);
+    process.exit(1);
+  } finally {
+    await DatabaseConnection.disconnect();
+  }
 }
 
-init()
-  .catch((e) => {
-    console.error("❌ Erro ao popular cursos:", e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+init();

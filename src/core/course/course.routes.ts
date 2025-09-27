@@ -8,5 +8,8 @@ CourseRoutes.post("/", CourseController.create);
 CourseRoutes.get("/:id", CourseController.findById);
 CourseRoutes.post("/register", authenticateToken, CourseController.register);
 CourseRoutes.post("/cancel", authenticateToken, CourseController.cancelRegistration);
+CourseRoutes.get("/available/list", CourseController.getAvailableCourses);
+CourseRoutes.get("/popular/list", CourseController.getPopularCourses);
+CourseRoutes.get("/search/name", CourseController.searchCourses);
 
 export default CourseRoutes;

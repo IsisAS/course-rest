@@ -1,21 +1,25 @@
-import { BaseRepositoryInterface, id } from "./repositories/base.repository";
-import { PaginateInterface } from "./interfaces/paginate.interface";
-export default class BaseService<Type> {
-    repository: BaseRepositoryInterface<Type>;
-    constructor(repository: new () => BaseRepositoryInterface<Type>);
-    getAll(enabled?: boolean, user?: any): Promise<Array<Type>>;
-    findById(id: id | string | undefined): Promise<Type | Type[]>;
-    paginate(page?: number, perPage?: number, sortBy?: string, sort?: string, query?: Record<string, unknown>, user?: any): Promise<PaginateInterface<Type>>;
-    search(query?: Record<string, unknown>): Promise<Type[]>;
-    first(query?: Record<string, unknown>): Promise<Type>;
-    create(props: Type): Promise<Type | undefined>;
-    updateById(id: id | string | undefined, props: any): Promise<Type | undefined>;
-    upsert(id: id | string, props: Type): Promise<Type | undefined>;
-    archiveById(id: id | string | undefined): Promise<Type>;
-    insertMany(props: Type[]): Promise<Type[] | undefined>;
-    archiveManyById(ids: id[] | string[] | undefined, enabled: boolean): Promise<unknown>;
-    archiveManyByQuery(query?: Record<string, unknown>): Promise<unknown>;
-    find(query?: Record<string, unknown>): Promise<Type | Type[] | undefined>;
-    deleteById(id: id | string | undefined): Promise<Type | undefined>;
+import { BaseRepositoryInterface } from "./repositories/base.repository";
+import { IBaseModel } from "./models/BaseModel";
+export declare abstract class BaseService<T extends IBaseModel> {
+    protected repository: BaseRepositoryInterface<T>;
+    constructor(repositoryClass: new () => BaseRepositoryInterface<T>);
+    getAll(filters?: Partial<T>): Promise<T[]>;
+    findById(id: string): Promise<T | null>;
+    create(data: Partial<T>): Promise<T>;
+    updateById(id: string, data: Partial<T>): Promise<T | null>;
+    deleteById(id: string): Promise<T | null>;
+    findOne(filters: Partial<T>): Promise<T | null>;
+    count(filters?: Partial<T>): Promise<number>;
+    exists(filters: Partial<T>): Promise<boolean>;
+    paginate(filters?: Partial<T>, page?: number, limit?: number, sort?: any): Promise<{
+        data: T[];
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    }>;
+    first(filters: Partial<T>): Promise<T | null>;
+    findMany(filters?: Partial<T>): Promise<T[]>;
 }
+export default BaseService;
 //# sourceMappingURL=base.service.d.ts.map

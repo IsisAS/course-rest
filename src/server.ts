@@ -1,24 +1,21 @@
-import { PrismaClient } from "@prisma/client";
 import cors from 'cors';
 import express, { Express } from "express";
 import http, { Server as HttpServer } from "http";
 import { Server as HttpsServer } from "https";
 import { AddressInfo } from "net";
 import ApiRoutes from "./core/api/api.routes";
+import DatabaseConnection from "./base/config/database";
 
 class Server {
     private app: Express;
     private server: HttpsServer | HttpServer;
     private port: number;
     private host: string;
-    prisma: PrismaClient;
-
 
     constructor() {
         this.app = express();
         this.port = Number(process.env.PORT) || 4000;
         this.host = process.env.HOST || "0.0.0.0";
-        this.prisma = new PrismaClient();
         this.server = http.createServer(this.app);
 
         this.app.use(cors({
@@ -37,9 +34,18 @@ class Server {
     }
 
     async init() {
-        this.app.set("trust proxy", 1);
-        this.app.use("/api", ApiRoutes);
-        this.startServer();
+        try {
+            console.log('🔄 Attempting to connect to database...');
+            await DatabaseConnection.connect();
+            console.log('✅ Database connected successfully');
+            
+            this.app.set("trust proxy", 1);
+            this.app.use("/api", ApiRoutes);
+            this.startServer();
+        } catch (error) {
+            console.error('❌ Failed to connect to database:', error);
+            process.exit(1);
+        }
     }
 }
 

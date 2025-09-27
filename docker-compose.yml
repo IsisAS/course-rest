@@ -4,32 +4,35 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "4000:4000"
+      - "3001:3001"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/curso_platform
+    depends_on:
+      - mongodb
     networks:
       - app_network
 
-  postgres:
-    image: postgres:latest
-    container_name: curso_postgres
+  mongodb:
+    image: mongo:latest
+    container_name: curso_mongodb
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: WSKEXPXdhNWOekZ
-      POSTGRES_DB: curso_platform
+      MONGO_INITDB_DATABASE: curso_platform
     ports:
-      - "5432:5432"
+      - "27017:27017"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mongodb_data:/data/db
     networks:
       - app_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 40s
 
 volumes:
-  postgres_data:
-    name: curso_postgres_data
+  mongodb_data:
+    name: curso_mongodb_data
 
 networks:
   app_network:

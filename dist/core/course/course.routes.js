@@ -35,8 +35,15 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const CourseController = __importStar(require("./course.controller"));
+const auth_1 = require("../api/middleware/auth");
 const CourseRoutes = (0, express_1.Router)();
 CourseRoutes.get("/", CourseController.getAllCourses);
 CourseRoutes.post("/", CourseController.create);
+CourseRoutes.get("/:id", CourseController.findById);
+CourseRoutes.post("/register", auth_1.authenticateToken, CourseController.register);
+CourseRoutes.post("/cancel", auth_1.authenticateToken, CourseController.cancelRegistration);
+CourseRoutes.get("/available/list", CourseController.getAvailableCourses);
+CourseRoutes.get("/popular/list", CourseController.getPopularCourses);
+CourseRoutes.get("/search/name", CourseController.searchCourses);
 exports.default = CourseRoutes;
 //# sourceMappingURL=course.routes.js.map

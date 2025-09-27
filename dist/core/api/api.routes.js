@@ -40,11 +40,13 @@ const express_1 = __importStar(require("express"));
 const auth_routes_1 = __importDefault(require("../auth/auth.routes"));
 const course_routes_1 = __importDefault(require("../course/course.routes"));
 const user_routes_1 = __importDefault(require("../user/user.routes"));
+const enrollment_routes_1 = __importDefault(require("../enrollment/enrollment.routes"));
 const ApiRoutes = (0, express_1.Router)();
 ApiRoutes.use(express_1.default.urlencoded({ extended: true }));
 ApiRoutes.use(express_1.default.json({ limit: "10mb" }));
 ApiRoutes.use('/auth', auth_routes_1.default);
 ApiRoutes.use('/user', user_routes_1.default);
 ApiRoutes.use('/courses', course_routes_1.default);
+ApiRoutes.use('/enrollments', enrollment_routes_1.default);
 exports.default = ApiRoutes;
 //# sourceMappingURL=api.routes.js.map

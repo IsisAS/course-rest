@@ -1,112 +1,78 @@
-import { Prisma } from "@prisma/client";
-import { BaseInterface } from "./interfaces/base.interface";
-import { BaseRepositoryInterface, id } from "./repositories/base.repository";
-import { PaginateInterface } from "./interfaces/paginate.interface";
-import { formatDates } from "../utils/format-date";
+import { BaseRepositoryInterface } from "./repositories/base.repository";
+import { IBaseModel } from "./models/BaseModel";
 
-export default class BaseService<Type> {
-    repository: BaseRepositoryInterface<Type>;
-    constructor(
-        repository: new () => BaseRepositoryInterface<Type>,
-    ) {
-        this.repository = new repository();
-    }
-    async getAll(enabled = true, user?: any): Promise<Array<Type>> {
-        if (enabled) {
-            return <Type[]>await this.repository.find().exec();
-        } else {
-            return <Type[]>await this.repository.all().exec();
-        }
-    }
-    async findById(id: id | string | undefined): Promise<Type | Type[]> {
-        return <Type>await this.repository.findById(id).exec();
-    }
-    async paginate(page = 1, perPage = 10, sortBy = "createdAt", sort = "desc", query?: Record<string, unknown>, user?: any): Promise<PaginateInterface<Type>> {
-        const prismaQuery: Prisma.InputJsonObject | undefined = query as Prisma.InputJsonObject;
-        const total = <number>await this.repository.count(prismaQuery);
-        const countPage = Math.floor(total / perPage) + (total % perPage == 0 ? 0 : 1);
+export abstract class BaseService<T extends IBaseModel> {
+    protected repository: BaseRepositoryInterface<T>;
 
-        page = page <= countPage ? page : countPage;
-
-        if (!page) {
-            page = 1;
-        }
-
-        const sortQuery: Record<string, Prisma.SortOrder> = {};
-        sortQuery[sortBy] = sort as Prisma.SortOrder;
-
-        const items = <Type[]>await this.repository
-            .find(prismaQuery)
-            .sort(sortQuery)
-            .startAt((page - 1) * perPage)
-            .size(perPage)
-            .exec();
-
-        const formattedItems = formatDates(items) as Type[];
-
-        return {
-            page,
-            perPage,
-            countPage,
-            sortBy,
-            sort,
-            total,
-            items: formattedItems,
-        };
+    constructor(repositoryClass: new () => BaseRepositoryInterface<T>) {
+        this.repository = new repositoryClass();
     }
-    async search(query?: Record<string, unknown>): Promise<Type[]> {
-        const prismaQuery: Prisma.InputJsonObject | undefined = query as Prisma.InputJsonObject;
-        return <Type[]>await this.repository.find(prismaQuery).exec();
-    }
-    async first(query?: Record<string, unknown>): Promise<Type> {
-        const prismaQuery: Prisma.InputJsonObject | undefined = query as Prisma.InputJsonObject;
-        return <Type>await this.repository.first(prismaQuery).exec();
-    }
-    async create(props: Type): Promise<Type | undefined> {
 
-        return <Type>await this.repository.create(props);
+    // Método para buscar todos os registros
+    public async getAll(filters: Partial<T> = {}): Promise<T[]> {
+        return await this.repository.find(filters);
     }
-    async updateById(id: id | string | undefined, props: any): Promise<Type | undefined> {
-        await this.repository.updateById(id, props);
 
-        return <Type>await this.repository.findById(id).exec();
+    // Método para buscar por ID
+    public async findById(id: string): Promise<T | null> {
+        return await this.repository.findById(id);
     }
-    async upsert(id: id | string, props: Type): Promise<Type | undefined> {
-        await this.repository.upsert(id, props);
-        return <Type>await this.repository.findById(id).exec();
-    }
-    async archiveById(id: id | string | undefined) {
-        return <Type>await this.repository.updateById(id, { enabled: false });
 
+    // Método para criar um novo registro
+    public async create(data: Partial<T>): Promise<T> {
+        return await this.repository.create(data);
     }
-    async insertMany(props: Type[]) {
-        return await this.repository.insertMany(props);
-    }
-    async archiveManyById(ids: id[] | string[] | undefined, enabled: boolean) {
-        return await this.repository.updateManyById(ids, { enabled });
-    }
-    async archiveManyByQuery(query: Record<string, unknown> = {}) {
-        const listIds: id[] = [];
 
-        const prismaQuery: Prisma.InputJsonObject = query as Prisma.InputJsonObject;
-
-        const data: any = await this.repository.find(prismaQuery).exec();
-
-        if (data?.length) {
-            data?.forEach((item: BaseInterface) => {
-                if (item.id) {
-                    listIds.push(item.id);
-                }
-            });
-        }
-
-        return await this.repository.updateManyById(listIds, { enabled: false });
+    // Método para atualizar por ID
+    public async updateById(id: string, data: Partial<T>): Promise<T | null> {
+        return await this.repository.updateById(id, data);
     }
-    async find(query?: Record<string, unknown>) {
-        const prismaQuery: Prisma.InputJsonObject | undefined = query as Prisma.InputJsonObject;
-        return this.repository.find(prismaQuery).exec();
+
+    // Método para deletar por ID
+    public async deleteById(id: string): Promise<T | null> {
+        return await this.repository.deleteById(id);
     }
-    async deleteById(id: id | string | undefined): Promise<Type | undefined> {
-        return <Type>await this.repository.deleteById(id);
+
+    // Método para buscar um registro
+    public async findOne(filters: Partial<T>): Promise<T | null> {
+        return await this.repository.findOne(filters);
+    }
+
+    // Método para contar registros
+    public async count(filters: Partial<T> = {}): Promise<number> {
+        return await this.repository.count(filters);
+    }
+
+    // Método para verificar se existe
+    public async exists(filters: Partial<T>): Promise<boolean> {
+        return await this.repository.exists(filters);
+    }
+
+    // Método para paginação
+    public async paginate(
+        filters: Partial<T> = {},
+        page: number = 1,
+        limit: number = 10,
+        sort: any = {}
+    ): Promise<{
+        data: T[];
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    }> {
+        return await this.repository.paginate(filters, page, limit, sort);
+    }
+
+    // Método para buscar primeiro registro (compatibilidade)
+    public async first(filters: Partial<T>): Promise<T | null> {
+        return await this.repository.findOne(filters);
+    }
+
+    // Método para buscar múltiplos registros (compatibilidade)
+    public async findMany(filters: Partial<T> = {}): Promise<T[]> {
+        return await this.repository.find(filters);
     }
 }
+
+export default BaseService;

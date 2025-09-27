@@ -1,36 +1,52 @@
-import { Prisma } from '@prisma/client';
-import PrismaRepository from './prisma.repository';
-export interface BaseRepositoryInterface<T> {
-    all: (query?: Prisma.InputJsonObject) => this;
-    count: (query?: Prisma.InputJsonObject, distinct?: string) => Promise<number>;
-    find: (query?: Prisma.InputJsonObject) => this;
-    first: (query?: Prisma.InputJsonObject) => this;
-    findById: (id: id | string | undefined) => this;
-    startAt: (startAt: number) => this;
-    sort: (sort: Record<string, Prisma.SortOrder>) => this;
-    size: (size: number) => this;
-    with: (...relations: (string | Record<string, any>)[]) => this;
-    upsert: (id: id | string, props: T) => Promise<T | undefined>;
-    select: (fields: Record<string, boolean>) => this;
-    group: (fields: Prisma.InputJsonObject) => this;
-    firstOrCreate: (props: T) => Promise<T | undefined>;
-    create: (props: T) => Promise<T | undefined>;
-    insertMany: (props: T[]) => Promise<T[] | undefined>;
-    updateById: (id: id | string | undefined, props: Prisma.InputJsonObject) => Promise<T | undefined>;
-    updateManyById: (ids: id[] | string[] | undefined, props: Prisma.InputJsonObject) => Promise<unknown>;
-    distinctFind: (query: Prisma.InputJsonObject, distinct: string, skip: number, take: number, orderBy: Record<string, Prisma.SortOrder>, mode: 'all' | 'specific') => Promise<T[]>;
-    distinctSpecificFind: (query: Prisma.InputJsonObject, distinct: string, orderBy: Record<string, Prisma.SortOrder>) => Promise<T[]>;
-    deleteById: (id: id | string | undefined) => Promise<T | undefined>;
-    deleteMany: (query?: Prisma.InputJsonObject) => Promise<void>;
-    deleteManyById: (ids: id[] | string[] | undefined) => Promise<void>;
-    unwind: (unwind: string) => this;
-    clear: () => Promise<void>;
-    exec: () => Promise<T[] | T | undefined>;
-    nativeSQL: (query: TemplateStringsArray | Prisma.Sql, ...values: any[]) => Promise<T[] | T | undefined>;
-    forceResetQuery: () => void;
+import { BaseModel, IBaseModel } from '../models/BaseModel';
+export interface BaseRepositoryInterface<T extends IBaseModel> {
+    create(data: Partial<T>): Promise<T>;
+    findById(id: string): Promise<T | null>;
+    findOne(filter: Partial<T>): Promise<T | null>;
+    find(filter?: Partial<T>, options?: any): Promise<T[]>;
+    updateById(id: string, data: Partial<T>): Promise<T | null>;
+    updateOne(filter: Partial<T>, data: Partial<T>): Promise<T | null>;
+    deleteById(id: string): Promise<T | null>;
+    deleteOne(filter: Partial<T>): Promise<T | null>;
+    deleteMany(filter: Partial<T>): Promise<{
+        deletedCount: number;
+    }>;
+    count(filter?: Partial<T>): Promise<number>;
+    exists(filter: Partial<T>): Promise<boolean>;
+    paginate(filter?: Partial<T>, page?: number, limit?: number, sort?: any): Promise<{
+        data: T[];
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    }>;
 }
-declare const BaseRepository: typeof PrismaRepository;
+export declare abstract class BaseRepository<T extends IBaseModel> implements BaseRepositoryInterface<T> {
+    protected model: BaseModel<T>;
+    constructor(model: BaseModel<T>);
+    create(data: Partial<T>): Promise<T>;
+    findById(id: string): Promise<T | null>;
+    findOne(filter: Partial<T>): Promise<T | null>;
+    find(filter?: Partial<T>, options?: any): Promise<T[]>;
+    findMany(filter?: Partial<T>, options?: any): Promise<T[]>;
+    updateById(id: string, data: Partial<T>): Promise<T | null>;
+    updateOne(filter: Partial<T>, data: Partial<T>): Promise<T | null>;
+    deleteById(id: string): Promise<T | null>;
+    deleteOne(filter: Partial<T>): Promise<T | null>;
+    deleteMany(filter: Partial<T>): Promise<{
+        deletedCount: number;
+    }>;
+    count(filter?: Partial<T>): Promise<number>;
+    exists(filter: Partial<T>): Promise<boolean>;
+    paginate(filter?: Partial<T>, page?: number, limit?: number, sort?: any): Promise<{
+        data: T[];
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    }>;
+    protected getModel(): BaseModel<T>;
+}
 export type id = string;
 export declare const parseId: (value: any) => string;
-export default BaseRepository;
 //# sourceMappingURL=base.repository.d.ts.map
